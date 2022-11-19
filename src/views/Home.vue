@@ -30,13 +30,24 @@ function addCollection() {
             console.log(error.response.data.error.message)
         })
 }
+function deleteCollection(collection_id) {
+    axios.delete(`collections/${collection_id}`)
+        .then(response => {
+            let i = collections.value.map(data => data.id).indexOf(collection_id);
+            collections.value.splice(i, 1);
+            console.log(response.data.data)
+        })
+        .catch(error => {
+            console.log(error.response.data.error.message)
+        })
+}
 
 const task = ref()
-function addTask() {
+function addTask(ct_id) {
     axios.post('tasks?populate=*', {
         data: {
             task: task.value,
-            collections: 4
+            collections: ct_id
         }
     })
         .then(response => {
@@ -48,15 +59,56 @@ function addTask() {
             console.log(error.response.data.error.message)
         })
 }
+
+const status = ref()
+function updateTaskF(task_id) {
+    axios.put(`tasks/${task_id}`, {
+        data: {
+            status: false,
+        }
+    })
+        .then(response => {
+            location.reload();
+            console.log(response.data.data)
+        })
+        .catch(error => {
+            console.log(error.response.data)
+        })
+}
+function updateTaskT(task_id) {
+    axios.put(`tasks/${task_id}`, {
+        data: {
+            status: true,
+        }
+    })
+        .then(response => {
+            location.reload();
+            console.log(response.data.data)
+        })
+        .catch(error => {
+            console.log(error.response.data.error)
+        })
+}
+
+function deleteTask(task_id) {
+    axios.delete(`tasks/${task_id}`)
+        .then(response => {
+            location.reload();
+            console.log(response.data.data)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+}
 </script>
 
 <template>
     <h1 class="text-center mt-4">Todo App</h1>
     
-    <form v-on:submit="addCollection">
+    <form v-on:submit.prevent="addCollection">
         <div class="input-group mb-3">
             <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
-            <button class="btn btn-primary" type="button">Submit</button>
+            <button class="btn btn-primary" type="submit">Submit</button>
         </div>
     </form>
 
@@ -64,20 +116,29 @@ function addTask() {
         <div v-for="collection in collections" v-bind:key="collection.id" class="col">
             <div class="card" style="max-width: 400px;">
                 <div class="card-header">
-                    {{ collection.attributes.name }}
+                    {{ collection.id }}: {{ collection.attributes.name }}
+                    <button @click="deleteCollection(collection.id)" type="button" class="btn btn-danger">Danger</button>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item">
                         {{ tasks.id }}: {{ tasks.attributes.task }} -
-                        <input v-model="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
+                        <input :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
                         <label for="status">{{ tasks.attributes.status }}</label>
+                        <br/>
+                        <button @click="deleteTask(tasks.id)" type="button" class="btn btn-danger">Danger</button>
+                        <div v-if="tasks.attributes.status === true">
+                            <button @click="updateTaskF(tasks.id)" type="button" class="btn btn-secondary">False</button>
+                        </div>
+                        <div v-if="tasks.attributes.status === false">
+                            <button @click="updateTaskT(tasks.id)" type="button" class="btn btn-secondary">True</button>
+                        </div>
                     </li>
                 </ul>
             </div>
-            <form v-on:submit="addTask">
+            <form v-on:submit="addTask(collection.id)">
                 <div class="input-group mb-3">
-                    <input v-model="task" class="form-control" type="text" placeholder="Add task">
-                    <button class="btn btn-outline-secondary" type="button">Submit</button>
+                    <input v-model.lazy="task" class="form-control" type="text" placeholder="Add task">
+                    <button class="btn btn-outline-secondary" type="submit">Submit</button>
                 </div>
             </form>
         </div>
