@@ -1,110 +1,102 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import axios from 'axios'
+    import { onMounted, ref } from 'vue'
+    import axios from 'axios'
+    import TrashCan from '@/components/icons/TrashIcon.vue'
 
-const collections = ref([])
-onMounted(() => {
-    axios.get('collections?populate=*')
-        .then(response => {
-            collections.value = response.data.data
-            console.log(response.data.data)
-        })
-        .catch(error => {
-            console.log(error)
-        })
-})
-
-const name = ref()
-function addCollection() {
-    axios.post('collections?populate=*', {
-        data: {
-            name: name.value
-        }
+    const collections = ref([])
+    onMounted(() => {
+        axios.get('collections?populate=*')
+            .then(response => {
+                collections.value = response.data.data
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
     })
-        .then(response => {
-            name.value = ''
-            collections.value.push(response.data.data)
-            console.log(response.data.data)
-        })
-        .catch(error => {
-            console.log(error.response.data.error.message)
-        })
-}
-function deleteCollection(collection_id) {
-    axios.delete(`collections/${collection_id}`)
-        .then(response => {
-            let i = collections.value.map(data => data.id).indexOf(collection_id);
-            collections.value.splice(i, 1);
-            console.log(response.data.data)
-        })
-        .catch(error => {
-            console.log(error.response.data.error.message)
-        })
-}
 
-const task = ref()
-function addTask(ct_id) {
-    axios.post('tasks?populate=*', {
-        data: {
-            task: task.value,
-            collections: ct_id
-        }
-    })
-        .then(response => {
-            task.value = ''
-            collections.value.push(response.data.data)
-            console.log(response.data.data)
+    const name = ref()
+    function addCollection() {
+        axios.post('collections?populate=*', {
+            data: {
+                name: name.value
+            }
         })
-        .catch(error => {
-            console.log(error.response.data.error.message)
-        })
-}
+            .then(response => {
+                name.value = ''
+                collections.value.push(response.data.data)
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 
-const status = ref()
-function updateTaskF(task_id) {
-    axios.put(`tasks/${task_id}`, {
-        data: {
-            status: false,
+    function deleteCollection(collection_id, collection_name) {
+        if (confirm(`Do you really want to delete ${collection_name}? `)) {
+            axios.delete(`collections/${collection_id}`)
+                .then(response => {
+                    let i = collections.value.map(data => data.id).indexOf(collection_id);
+                    collections.value.splice(i, 1);
+                    console.log(response.data.data)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
         }
-    })
-        .then(response => {
-            location.reload();
-            console.log(response.data.data)
-        })
-        .catch(error => {
-            console.log(error.response.data)
-        })
-}
-function updateTaskT(task_id) {
-    axios.put(`tasks/${task_id}`, {
-        data: {
-            status: true,
-        }
-    })
-        .then(response => {
-            location.reload();
-            console.log(response.data.data)
-        })
-        .catch(error => {
-            console.log(error.response.data.error)
-        })
-}
+    }
 
-function deleteTask(task_id) {
-    axios.delete(`tasks/${task_id}`)
-        .then(response => {
-            location.reload();
-            console.log(response.data.data)
+    const task = ref()
+    function addTask(ct_id) {
+        axios.post('tasks?populate=*', {
+            data: {
+                task: task.value,
+                collections: ct_id
+            }
         })
-        .catch(error => {
-            console.log(error)
+            .then(response => {
+                task.value = ''
+                collections.value.push(response.data.data)
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const status = ref()
+    function updateTask(task_id) {
+        axios.put(`tasks/${task_id}`, {
+            data: {
+                status: status.value,
+            }
         })
-}
+            .then(response => {
+                location.reload();
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    function deleteTask(task_id, task_name) {
+        if (confirm(`Do you really want to delete ${task_name}? `)) {
+            axios.delete(`tasks/${task_id}`)
+                .then(response => {
+                    location.reload();
+                    console.log(response.data.data)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        }
+    }
 </script>
 
 <template>
     <h1 class="text-center mt-4">Todo App</h1>
-    
+
     <form v-on:submit.prevent="addCollection">
         <div class="input-group mb-3">
             <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
@@ -117,21 +109,18 @@ function deleteTask(task_id) {
             <div class="card" style="max-width: 400px;">
                 <div class="card-header">
                     {{ collection.id }}: {{ collection.attributes.name }}
-                    <button @click="deleteCollection(collection.id)" type="button" class="btn btn-danger">Danger</button>
+                    <a @click="deleteCollection(collection.id, collection.attributes.name)" type="button" class="text-dark float-end">
+                        <TrashCan />
+                    </a>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item">
-                        {{ tasks.id }}: {{ tasks.attributes.task }} -
-                        <input :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
-                        <label for="status">{{ tasks.attributes.status }}</label>
-                        <br/>
-                        <button @click="deleteTask(tasks.id)" type="button" class="btn btn-danger">Danger</button>
-                        <div v-if="tasks.attributes.status === true">
-                            <button @click="updateTaskF(tasks.id)" type="button" class="btn btn-secondary">False</button>
-                        </div>
-                        <div v-if="tasks.attributes.status === false">
-                            <button @click="updateTaskT(tasks.id)" type="button" class="btn btn-secondary">True</button>
-                        </div>
+                    <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item border-bottom">
+                        <input @change="updateTask(tasks.id)" v-model="status" :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
+                        <span v-if="tasks.attributes.status === true" class="text-decoration-line-through ms-2">{{ tasks.attributes.task }}</span>
+                        <span v-else class="ms-2">{{ tasks.attributes.task }}</span>
+                        <a @click="deleteTask(tasks.id, tasks.attributes.task)" type="button" class="text-dark float-end">
+                            <TrashCan />
+                        </a>
                     </li>
                 </ul>
             </div>
