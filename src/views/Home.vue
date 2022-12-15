@@ -92,44 +92,63 @@
                 })
         }
     }
+    const mode = localStorage.getItem('vueuse-color-scheme')
+    console.log(mode)
 </script>
 
 <template>
-    <h1 class="text-center mt-4">Todo App</h1>
+    <div class="mt-5">
+        <h1 v-if="mode === 'light'" class="text-center mt-4 text-dark">Todo App</h1>
+        <h1 v-if="mode === 'dark'" class="text-center mt-4 text-light">Todo App</h1>
 
-    <form v-on:submit.prevent="addCollection">
-        <div class="input-group mb-3">
-            <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </div>
-    </form>
+        <form v-on:submit.prevent="addCollection">
+            <div class="input-group mb-3">
+                <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </form>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div v-for="collection in collections" v-bind:key="collection.id" class="col">
-            <div class="card" style="max-width: 400px;">
-                <div class="card-header">
-                    {{ collection.id }}: {{ collection.attributes.name }}
-                    <a @click="deleteCollection(collection.id, collection.attributes.name)" type="button" class="text-dark float-end">
-                        <TrashCan />
-                    </a>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item border-bottom">
-                        <input @change="updateTask(tasks.id)" v-model="status" :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
-                        <span v-if="tasks.attributes.status === true" class="text-decoration-line-through ms-2">{{ tasks.attributes.task }}</span>
-                        <span v-else class="ms-2">{{ tasks.attributes.task }}</span>
-                        <a @click="deleteTask(tasks.id, tasks.attributes.task)" type="button" class="text-dark float-end">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <div v-for="collection in collections" v-bind:key="collection.id" class="col">
+                <div class="card" style="max-width: 400px;">
+                    <div class="card-header">
+                        {{ collection.id }}: {{ collection.attributes.name }}
+                        <a @click="deleteCollection(collection.id, collection.attributes.name)" type="button" class="text-dark float-end">
                             <TrashCan />
                         </a>
-                    </li>
-                </ul>
-            </div>
-            <form v-on:submit="addTask(collection.id)">
-                <div class="input-group mb-3">
-                    <input v-model.lazy="task" class="form-control" type="text" placeholder="Add task">
-                    <button class="btn btn-outline-secondary" type="submit">Submit</button>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item border-bottom">
+                            <input @change="updateTask(tasks.id)" v-model="status" :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
+                            <span v-if="tasks.attributes.status === true" class="text-decoration-line-through ms-2">{{ tasks.attributes.task }}</span>
+                            <span v-else class="ms-2">{{ tasks.attributes.task }}</span>
+                            <a @click="deleteTask(tasks.id, tasks.attributes.task)" type="button" class="text-dark float-end">
+                                <TrashCan />
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-            </form>
+                <form v-on:submit="addTask(collection.id)">
+                    <div class="input-group mb-3">
+                        <input v-model.lazy="task" class="form-control" type="text" placeholder="Add task">
+                        <button class="btn btn-outline-secondary" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+    .btn-bd-dark {
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bs-dark);
+    }
+
+    .btn-bd-light {
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-dark);
+        --bs-btn-bg: var(--bs-light);
+    }
+</style>
