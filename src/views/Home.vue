@@ -92,14 +92,14 @@
                 })
         }
     }
-    const mode = localStorage.getItem('vueuse-color-scheme')
-    console.log(mode)
+
+    // const mode = ref(localStorage.getItem('vueuse-color-scheme'))
+    // console.log(mode.value)
 </script>
 
 <template>
     <div class="mt-5">
-        <h1 v-if="mode === 'light'" class="text-center mt-4 text-dark">Todo App</h1>
-        <h1 v-if="mode === 'dark'" class="text-center mt-4 text-light">Todo App</h1>
+        <h1 class="text-center mt-4">Todo App</h1>
 
         <form v-on:submit.prevent="addCollection">
             <div class="input-group mb-3">
@@ -118,7 +118,7 @@
                         </a>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item border-bottom">
+                        <li v-for="tasks in collection.attributes.tasks.data" class="list-group-item">
                             <input @change="updateTask(tasks.id)" v-model="status" :checked="tasks.attributes.status" class="form-check-input" type="checkbox" id="status" />
                             <span v-if="tasks.attributes.status === true" class="text-decoration-line-through ms-2">{{ tasks.attributes.task }}</span>
                             <span v-else class="ms-2">{{ tasks.attributes.task }}</span>
@@ -131,7 +131,7 @@
                 <form v-on:submit="addTask(collection.id)">
                     <div class="input-group mb-3">
                         <input v-model.lazy="task" class="form-control" type="text" placeholder="Add task">
-                        <button class="btn btn-outline-secondary" type="submit">Submit</button>
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
                 </form>
             </div>
@@ -139,16 +139,38 @@
     </div>
 </template>
 
-<style scoped>
-    .btn-bd-dark {
-        --bs-btn-font-weight: 600;
-        --bs-btn-color: var(--bs-white);
-        --bs-btn-bg: var(--bs-dark);
+<style>
+    .dark h1 {
+        color: var(--bs-light)
     }
 
-    .btn-bd-light {
-        --bs-btn-font-weight: 600;
-        --bs-btn-color: var(--bs-dark);
-        --bs-btn-bg: var(--bs-light);
+    .dark div.card {
+        --bs-card-border-color: var(--bs-black);
+        --bs-card-cap-bg: var(--bs-dark);
+        --bs-card-cap-color: var(--bs-light);
+        --bs-card-color: var(--bs-light);
+        --bs-card-bg: var(--bs-dark);
+        --bs-card-cap-bg: #101214;
+        box-shadow: 0 2px 15px -3px rgba(255, 255, 255, 0.07), 0 10px 20px -2px rgba(255, 255, 255, 0.04);
+    }
+
+    .dark ul.list-group {
+        --bs-list-group-color: var(--bs-white);
+        --bs-list-group-border-width: 1px;
+        --bs-list-group-bg: var(--bs-dark);
+        --bs-list-group-border-color: var(--bs-black);
+    }
+
+    .dark svg {
+        color: var(--bs-white);
+    }
+
+    .dark input {
+        background-color: var(--bs-dark);
+        border: 1px solid var(--bs-black);
+    }
+
+    .light div.card {
+        box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
     }
 </style>
