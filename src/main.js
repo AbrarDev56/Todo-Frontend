@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import axios from 'axios'
 
 axios.defaults.baseURL = 'http://localhost:1337/api/'
@@ -10,8 +11,11 @@ axios.defaults.baseURL = 'http://localhost:1337/api/'
 import "bootstrap/dist/css/bootstrap.min.css"
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createPinia())
+pinia.use(piniaPluginPersistedstate)
+
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')
@@ -20,7 +24,7 @@ app.mount('#app')
 // import 'bootstrap/js/dist/button';
 // import 'bootstrap/js/dist/carousel';
 // import 'bootstrap/js/dist/collapse';
-// import 'bootstrap/js/dist/dropdown';
+import 'bootstrap/js/dist/dropdown';
 // import 'bootstrap/js/dist/modal';
 // import 'bootstrap/js/dist/offcanvas';
 // import 'bootstrap/js/dist/popover';
