@@ -33,7 +33,7 @@
         <div class="container">
             <div class="row d-flex justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6">
-                    <div class="card bg-white">
+                    <div class="card">
 
                         <div class="card-body p-5">
 
@@ -53,7 +53,7 @@
                                     <input v-model="password" type="password" class="form-control" id="password" placeholder="*******" required>
                                 </div>
                                 <div class="d-grid">
-                                    <button class="btn btn-outline-dark" type="submit">Sign Up</button>
+                                    <button class="btn btn-outline-primary" type="submit">Sign Up</button>
                                 </div>
                             </form>
 

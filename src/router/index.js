@@ -10,6 +10,16 @@ const router = createRouter({
             component: Home
         },
         {
+            path: '/collections',
+            name: 'collections',
+            component: () => import('../views/Collections.vue')
+        },
+        {
+            path: '/tasks',
+            name: 'tasks',
+            component: () => import('../views/Tasks.vue')
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('../views/Login.vue')
