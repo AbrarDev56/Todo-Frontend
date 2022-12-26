@@ -9,7 +9,7 @@
     import { useAuthStore } from "@/stores/auth"
 
     import Profile from '@/components/icons/ProfileIcon.vue'
-    import Task from '@/components/icons/TaskIcon.vue'
+    import Plus from '@/components/icons/PlusIcon.vue'
     import Collection from '@/components/icons/CollectionIcon.vue'
     import Home from '@/components/icons/HomeIcon.vue'
 
@@ -17,7 +17,8 @@
     const authStore = useAuthStore();
     const { removeToken } = authStore
     const router = useRouter()
-    
+
+    const collections = ref([])
     const profile = ref('')
     onMounted(() => {
         axios.get('users/me', {
@@ -32,7 +33,33 @@
             .catch(error => {
                 console.log(error)
             })
+
+        axios.get('collections?populate=*')
+            .then(response => {
+                collections.value = response.data.data
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
     })
+
+    const name = ref()
+    function addCollection() {
+        axios.post('collections?populate=*', {
+            data: {
+                name: name.value
+            }
+        })
+            .then(response => {
+                name.value = ''
+                collections.value.push(response.data.data)
+                console.log(response.data.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 
     function Logout() {
         removeToken()
@@ -59,20 +86,45 @@
                         Home
                     </RouterLink>
                 </li>
-                <li>
-                    <RouterLink to="/collections" class="nav-link">
+                <li v-for="collection in collections" v-bind:key="collection.id" class="nav-item">
+                    <a :href="`${collection.id}`" class="nav-link">
                         <Collection class="me-2" />
-                        Collections
-                    </RouterLink>
+                        {{ collection.id }}: {{ collection.attributes.name }}
+                    </a>
                 </li>
-                <li>
-                    <RouterLink to="/tasks" class="nav-link">
-                        <Task class="me-2" />
-                        Tasks
-                    </RouterLink>
+                <li class="nav-item">
+                    <a class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <Plus class="me-2" />
+                        Add a Collection
+                    </a>
                 </li>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Add a Collection</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form v-on:submit.prevent="addCollection" class="mt-3">
+                                <div class="modal-body">
+                                    <div class="input-group mb-3">
+                                        <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </ul>
+
             <hr>
+
             <a v-if="!isAuthenticated" @click="next()" type="button">
                 <span class="ml-2 text-capitalize">{{ mode }}</span>
             </a>
@@ -103,8 +155,7 @@
             </div>
         </div>
 
-
-        <div class="container-fluid">
+        <div class="container-fluid mt-3">
             <RouterView />
         </div>
 
@@ -171,6 +222,12 @@
 
     .dark div.sidebar {
         background-color: var(--bs-dark);
+    }
+
+    .dark div.modal-content {
+        background-color: var(--bs-dark);
+        --bs-modal-header-border-color: var(--bs-black);
+        --bs-modal-footer-border-color: var(--bs-black);
     }
 </style>
 
