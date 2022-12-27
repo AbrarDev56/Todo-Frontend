@@ -16,6 +16,7 @@
     const { isAuthenticated } = storeToRefs(useAuthStore())
     const authStore = useAuthStore();
     const { removeToken } = authStore
+    
     const router = useRouter()
 
     const collections = ref([])
@@ -27,6 +28,7 @@
             }
         })
             .then(response => {
+                profile_id.value = response.data.id
                 profile.value = (response.data)
                 console.log(response.data)
             })
@@ -34,7 +36,11 @@
                 console.log(error)
             })
 
-        axios.get('collections?populate=*')
+        axios.get('collections?populate=*', {
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`
+            }
+        })
             .then(response => {
                 collections.value = response.data.data
                 console.log(response.data.data)
@@ -45,10 +51,15 @@
     })
 
     const name = ref()
+    const profile_id = ref('')
     function addCollection() {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
         axios.post('collections?populate=*', {
             data: {
-                name: name.value
+                name: name.value,
+                user: {
+                    id: profile_id.value
+                }
             }
         })
             .then(response => {
@@ -89,7 +100,7 @@
                 <li v-for="collection in collections" v-bind:key="collection.id" class="nav-item">
                     <a :href="`${collection.id}`" class="nav-link">
                         <Collection class="me-2" />
-                        {{ collection.id }}: {{ collection.attributes.name }}
+                        {{ collection.attributes.name }}
                     </a>
                 </li>
                 <li class="nav-item">

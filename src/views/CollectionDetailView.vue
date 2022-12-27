@@ -4,14 +4,35 @@
     import axios from 'axios'
     import TrashCan from '@/components/icons/TrashIcon.vue'
 
+    import { useAuthStore } from "@/stores/auth"
+
+    const authStore = useAuthStore();
+
     const route = useRoute();
 
     const id = ref()
     const name = ref()
     const tasks = ref([])
     onMounted(() => {
+        axios.get('users/me', {
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`
+            }
+        })
+            .then(response => {
+                profile_id.value = response.data.id
+                console.log(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+
         const collection_detail = route.params.collection_detail
-        axios.get(`collections/${collection_detail}?populate=*`)
+        axios.get(`collections/${collection_detail}?populate=*`, {
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`
+            }
+        })
             .then(response => {
                 id.value = response.data.data.id
                 name.value = response.data.data.attributes.name
@@ -26,6 +47,7 @@
 
     function deleteCollection(collection_id, collection_name) {
         if (confirm(`Do you really want to delete ${collection_name}? `)) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
             axios.delete(`collections/${collection_id}`)
                 .then(response => {
                     location.replace('/')
@@ -38,11 +60,16 @@
     }
 
     const task = ref()
+    const profile_id = ref('')
     function addTask(ct_id) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
         axios.post('tasks?populate=*', {
             data: {
                 task: task.value,
-                collections: ct_id
+                collections: ct_id,
+                user: {
+                    id: profile_id.value
+                }
             }
         })
             .then(response => {
@@ -57,6 +84,7 @@
 
     const status = ref()
     function updateTask(task_id) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
         axios.put(`tasks/${task_id}`, {
             data: {
                 status: status.value,
@@ -73,6 +101,7 @@
 
     function deleteTask(task_id, task_name) {
         if (confirm(`Do you really want to delete ${task_name}? `)) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
             axios.delete(`tasks/${task_id}`)
                 .then(response => {
                     let i = tasks.value.map(data => data.id).indexOf(task_id);
@@ -99,11 +128,10 @@
             <button class="btn btn-primary" type="submit">Submit</button>
         </div>
     </form>
-    
+
     <div v-for="task in tasks" v-bind:key="task.id" class="mb-2">
         <div class="card">
             <div class="card-body text-center">
-                {{ task.attributes.status }}
                 <input @change="updateTask(task.id)" v-model.lazy="status" :checked="task.attributes.status" class="form-check-input float-start" type="checkbox" id="status" />
                 <span v-if="task.attributes.status" class="text-decoration-line-through">{{ task.attributes.task }}</span>
                 <span v-else>{{ task.attributes.task }}</span>

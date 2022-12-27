@@ -21,7 +21,7 @@
                     setToken(token)
                     console.log('User profile', response.data.user);
                     console.log('User token', token);
-                    router.push('/')
+                    location.replace('/')
                 })
                 .catch(error => {
                     console.log(error.response.data.error.message)
