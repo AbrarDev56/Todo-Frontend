@@ -39,14 +39,14 @@
                     <div class="card">
                         <div class="card-body p-5">
                             <form @submit.prevent="Login" class="mb-3 mt-md-4">
-                                <h2 class="fw-bold mb-2 text-uppercase ">Login</h2>
+                                <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
                                 <p class=" mb-4">Please enter your email and password!</p>
                                 <div class="mb-3">
-                                    <label for="email" class="form-label ">Email address</label>
+                                    <label for="email" class="form-label">Email address</label>
                                     <input v-model="identifier" type="email" class="form-control" id="email" placeholder="name@example.com" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="password" class="form-label ">Password</label>
+                                    <label for="password" class="form-label">Password</label>
                                     <input v-model="password" type="password" class="form-control" id="password" placeholder="*******" required>
                                 </div>
                                 <div class="d-grid">

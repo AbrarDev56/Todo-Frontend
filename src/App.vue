@@ -194,6 +194,10 @@
         color: var(--bs-light)
     }
 
+    .dark a:hover {
+        color: var(--bs-secondary)
+    }
+
     .dark span {
         color: var(--bs-light)
     }

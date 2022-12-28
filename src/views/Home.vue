@@ -2,9 +2,11 @@
     import { onMounted, ref } from 'vue'
     import axios from 'axios'
     import TrashCan from '@/components/icons/TrashIcon.vue'
-
+  
+    import { storeToRefs } from 'pinia';
     import { useAuthStore } from "@/stores/auth"
 
+    const { isAuthenticated } = storeToRefs(useAuthStore())
     const authStore = useAuthStore();
 
     const tasks = ref([])
@@ -91,12 +93,14 @@
 </script>
 
 <template>
-    <form v-on:submit.prevent="addTask">
+    <form v-if="isAuthenticated" v-on:submit.prevent="addTask">
         <div class="input-group mb-3">
             <input v-model="task" class="form-control" type="text" placeholder="Add task">
             <button class="btn btn-primary" type="submit">Submit</button>
         </div>
     </form>
+    
+    <h1 v-if="!isAuthenticated" class="text-center">Login or Sign Up!</h1>
 
     <div v-for="task in tasks" v-bind:key="task.id" class="mb-2">
         <div class="card">
