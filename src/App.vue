@@ -16,7 +16,7 @@
     const { isAuthenticated } = storeToRefs(useAuthStore())
     const authStore = useAuthStore();
     const { removeToken } = authStore
-    
+
     const router = useRouter()
 
     const collections = ref([])
@@ -84,87 +84,178 @@
 </script>
 
 <template>
-    <div class="d-flex">
-        <div v-if="!['login', 'signup'].includes($route.name)" class="d-flex flex-column flex-shrink-0 me-4 container-fluid sidebar" style="width: 280px; height: 100vh;">
-            <a href="/" class="d-flex align-items-center mt-3 mb-3 mb-md-0 me-md-auto text-decoration-none">
-                <span class="fs-4">Task App</span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <RouterLink to="/" class="nav-link">
-                        <Home class="me-2" />
-                        Home
-                    </RouterLink>
-                </li>
-                <li v-for="collection in collections" v-bind:key="collection.id" class="nav-item">
-                    <a :href="`${collection.id}`" class="nav-link">
-                        <Collection class="me-2" />
-                        {{ collection.attributes.name }}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        <Plus class="me-2" />
-                        Add a Collection
-                    </a>
-                </li>
-
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Add a Collection</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form v-on:submit.prevent="addCollection" class="mt-3">
-                                <div class="modal-body">
-                                    <div class="input-group mb-3">
-                                        <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </ul>
-
-            <hr>
-
-            <a v-if="!isAuthenticated" @click="next()" type="button">
-                <span class="ml-2 text-capitalize">{{ mode }}</span>
-            </a>
-            <RouterLink v-if="!isAuthenticated" to="/login">Login</RouterLink>
-            <RouterLink v-if="!isAuthenticated" to="/signup" class="mb-3">Register</RouterLink>
-
-            <div v-if="isAuthenticated" class="dropdown mb-3">
-                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <Profile />
-                    <strong class="ms-2">{{ profile.username }}</strong>
+    <div class="d-none d-md-block">
+        <div class="d-flex">
+            <div v-if="!['login', 'signup'].includes($route.name)" class="d-flex flex-column flex-shrink-0 me-4 container-fluid sidebar" style="width: 280px; height: 100vh;">
+                <a href="/" class="d-flex align-items-center mt-3 mb-3 mb-md-0 me-md-auto text-decoration-none">
+                    <span class="fs-4">Task App</span>
                 </a>
-                <ul class="dropdown-menu text-small">
-                    <li>
-                        <a @click="next()" type="button" class="btn">
-                            <div class="text-capitalize" v-if="mode === 'light'">
-                                {{ mode }}
-                            </div>
-                            <div class="text-capitalize" v-if="mode === 'dark'">
-                                {{ mode }}
-                            </div>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <RouterLink to="/" class="nav-link">
+                            <Home class="me-2" />
+                            Home
+                        </RouterLink>
+                    </li>
+                    <li v-for="collection in collections" v-bind:key="collection.id" class="nav-item">
+                        <a :href="`${collection.id}`" class="nav-link">
+                            <Collection class="me-2" />
+                            {{ collection.attributes.name }}
                         </a>
                     </li>
-                    <li>
-                        <hr class="dropdown-divider">
+                    <li class="nav-item">
+                        <a class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <Plus class="me-2" />
+                            Add a Collection
+                        </a>
                     </li>
-                    <li><a @click="Logout()" class="dropdown-item" type="button">Sign out</a></li>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add a Collection</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form v-on:submit.prevent="addCollection" class="mt-3">
+                                    <div class="modal-body">
+                                        <div class="input-group mb-3">
+                                            <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </ul>
+
+                <hr>
+
+                <a v-if="!isAuthenticated" @click="next()" type="button">
+                    <span class="ml-2 text-capitalize">{{ mode }}</span>
+                </a>
+                <RouterLink v-if="!isAuthenticated" to="/login">Login</RouterLink>
+                <RouterLink v-if="!isAuthenticated" to="/signup" class="mb-3">Register</RouterLink>
+
+                <div v-if="isAuthenticated" class="dropdown mb-3">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <Profile />
+                        <strong class="ms-2">{{ profile.username }}</strong>
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li>
+                            <a @click="next()" type="button" class="btn">
+                                <div class="text-capitalize" v-if="mode === 'light'">
+                                    {{ mode }}
+                                </div>
+                                <div class="text-capitalize" v-if="mode === 'dark'">
+                                    {{ mode }}
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a @click="Logout()" class="dropdown-item" type="button">Sign out</a></li>
+                    </ul>
+                </div>
             </div>
+
+            <div class="container-fluid mt-3">
+                <RouterView />
+            </div>
+
         </div>
+    </div>
+
+    <div class="d-block d-md-none">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Task App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/">Home</a>
+                        </li>
+                        <li v-for="collection in collections" v-bind:key="collection.id" class="nav-item">
+                            <a :href="`${collection.id}`" class="nav-link">
+                                {{ collection.attributes.name }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" type="button" data-bs-toggle="modal" data-bs-target="#exampleModala">
+                                Add a Collection
+                            </a>
+                        </li>
+
+                        <div class="modal fade" id="exampleModala" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add a Collection</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form v-on:submit.prevent="addCollection" class="mt-3">
+                                        <div class="modal-body">
+                                            <div class="input-group mb-3">
+                                                <input v-model="name" class="form-control" type="text" placeholder="Create a new collection">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <li class="nav-item">
+                            <a v-if="!isAuthenticated" @click="next()" class="nav-link" type="button">
+                                <span class="ml-2 text-capitalize">{{ mode }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <RouterLink v-if="!isAuthenticated" class="nav-link" to="/login">Login</RouterLink>
+                        </li>
+                        <li class="nav-item">
+                            <RouterLink v-if="!isAuthenticated" to="/signup" class="nav-link">Register</RouterLink>
+                        </li>
+
+                        <div v-if="isAuthenticated" class="dropdown">
+                            <a href="#" class="text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <strong>{{ profile.username }}</strong>
+                            </a>
+                            <ul class="dropdown-menu text-small">
+                                <li>
+                                    <a @click="next()" type="button" class="btn">
+                                        <div class="text-capitalize" v-if="mode === 'light'">
+                                            {{ mode }}
+                                        </div>
+                                        <div class="text-capitalize" v-if="mode === 'dark'">
+                                            {{ mode }}
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a @click="Logout()" class="dropdown-item" type="button">Sign out</a></li>
+                            </ul>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
         <div class="container-fluid mt-3">
             <RouterView />
@@ -243,6 +334,12 @@
         background-color: var(--bs-dark);
         --bs-modal-header-border-color: var(--bs-black);
         --bs-modal-footer-border-color: var(--bs-black);
+    }
+
+    .dark nav.navbar {
+        --bs-navbar-brand-color: var(--bs-white);
+        --bs-navbar-toggler-border-color: var(--bs-black);
+        background-color: var(--bs-dark);
     }
 </style>
 
